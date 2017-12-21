@@ -245,3 +245,39 @@ void simple_yuv420_graybar(int width, int height, int ymin, int ymax, int barnum
 	free(data_u);
 	free(data_v);
 }
+
+/**
+*	calculate two YUV420p pictures's psrn.
+*
+*
+*
+**********/
+void simple_yuv420_psnr(const char* url1, const char* url2, int h, int w, int num)
+{
+
+	FILE *fp1 = fopen(url1, "rb+");
+	FILE *fp2 = fopen(url2, "rb+");
+	unsigned char *pic1 = (unsigned char *)malloc(w*h);
+	unsigned char *pic2 = (unsigned char *)malloc(w*h);
+
+	fread(pic1, w*h, 1, fp1);
+	fread(pic2, w*h, 1, fp2);
+
+	double mse_sum = 0, mse = 0, psnr = 0;
+	for (int i = 0; i < h*w; i++)
+	{
+		mse_sum += pow(double(pic1[i] - pic2[i]), 2);
+	}
+	mse = mse_sum / (h*w);
+	psnr = 10 * log10(255.0*255.0 / mse);
+	printf("%5.3f\n", psnr);
+
+	fseek(fp1, w*h / 2, SEEK_CUR);
+	fseek(fp2, w*h / 2, SEEK_CUR);
+
+	free(pic1);
+	free(pic2);
+	fclose(fp1);
+	fclose(fp2);
+
+}
