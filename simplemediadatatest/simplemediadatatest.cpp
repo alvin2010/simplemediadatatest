@@ -20,12 +20,16 @@ int _tmain(int argc, _TCHAR* argv[])
 	simple_yuv420_border("lena_256x256_yuv420p.yuv", 256, 256, 20, 1);
 	
 	//	graybar
-	simple_yuv420_graybar(640, 360, 0, 255, 10, "graybar_640x360.yuv");
+	simple_yuv420_graybar(640, 360, 0, 255, 10, "output_graybar_640x360.yuv");
 
 	//	psnr
 	simple_yuv420_psnr("lena_256x256_yuv420p.yuv", "lena_distort_256x256_yuv420p.yuv", 256, 256, 1);
 
-	
+	// split
+	simple_rgb24_split("cie1931_500x500.rgb", 500, 500, 1);
+	simple_rgb24_to_bmp("lena_256x256_rgb24.rgb", 256, 256, "output_lena.bmp");
+	simple_rgb24_to_yuv420("lena_256x256_rgb24.rgb", 256, 256, "output_lena.yuv");
+	simple_rgb24_colorbar(640, 360, "output_colorbar.rgb");
 	return 0;
 }
 

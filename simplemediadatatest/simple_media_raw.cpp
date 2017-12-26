@@ -281,3 +281,271 @@ void simple_yuv420_psnr(const char* url1, const char* url2, int h, int w, int nu
 	fclose(fp2);
 
 }
+
+/**
+*	split r g b panels from rgb24 picture
+*
+*
+*
+**********/
+void simple_rgb24_split(const char* url, int w, int h, int num)
+{
+	FILE *fp = fopen(url, "rb+");
+	FILE *fp1 = fopen("output_r.y", "wb+");
+	FILE *fp2 = fopen("output_g.y", "wb+");
+	FILE *fp3 = fopen("output_b.y", "wb+");
+
+	unsigned char* pic = (unsigned char*)malloc(w*h*3);
+
+	for (int i = 0; i < num; i++)
+	{
+		fread(pic, w*h * 3, 1, fp);
+		for (int j = 0; j < w*h*3; j+=3)
+		{
+			fwrite(pic+j, 1, 1, fp1);
+			fwrite(pic + j + 1, 1, 1, fp2);
+			fwrite(pic + j + 2, 1, 1, fp3);
+		}
+	}
+
+	free(pic);
+	fclose(fp);
+	fclose(fp1);
+	fclose(fp2);
+	fclose(fp3);
+}
+
+/**
+*	Convert RGB24 file to BMP file
+*
+*
+*
+**********/
+void simple_rgb24_to_bmp(const char *rgb24path, int width, int height, const char *bmppath)
+{
+	typedef struct
+	{
+		long imagesize;
+		long black;
+		long startPosition;
+	}BmpHead;
+
+	typedef struct
+	{
+		long  size;
+		long  width;
+		long  height;
+		unsigned short  colorPlane;
+		unsigned short  bitColor;
+		long  zipFormat;
+		long  realSize;
+		long  xPels;
+		long  yPels;
+		long  colorUse;
+		long  colorImportant;
+	}InfoHead;
+
+	char bfType[2] = { 'B', 'M' };
+	BmpHead bmpHead = { 0 };
+	InfoHead infoHead = { 0 };
+
+	int head_size = sizeof(bfType)+sizeof(BmpHead)+sizeof(InfoHead);
+	bmpHead.imagesize = head_size + width*height * 3;
+	bmpHead.startPosition = head_size;
+
+	unsigned char* rgb_buffer = (unsigned char*)malloc(width*height * 3);
+	FILE *fpRgb = NULL, *fpBmp = NULL;
+	fpRgb = fopen(rgb24path, "rb");
+	fpBmp = fopen(bmppath, "wb");
+	fread(rgb_buffer,width*height*3,1,fpRgb);
+
+	bmpHead.imagesize = 3 * width*height + head_size;
+	bmpHead.startPosition = head_size;
+
+	infoHead.size = sizeof(InfoHead);
+	infoHead.width = width;
+	//BMP storage pixel data in opposite direction of Y-axis (from bottom to top).  
+	infoHead.height = -height;
+	infoHead.colorPlane = 1;
+	infoHead.bitColor = 24;
+	infoHead.realSize = 3 * width*height;
+
+	fwrite(bfType, sizeof(bfType),1,fpBmp);
+	fwrite(&bmpHead,sizeof(BmpHead),1,fpBmp);
+	fwrite(&infoHead,sizeof(InfoHead),1,fpBmp);
+
+	//BMP save R1|G1|B1,R2|G2|B2 as B1|G1|R1,B2|G2|R2  
+    //It saves pixel data in Little Endian  
+    //So we change 'R' and 'B'  
+	for (int i = 0; i < height; i++)
+	{
+		for (int j = 0; j < width; j++)
+		{
+			unsigned char tmp = rgb_buffer[(i*width + j)*3 + 2];
+			rgb_buffer[(i*width + j)*3 + 2] = rgb_buffer[(i*width + j)*3];
+			rgb_buffer[(i*width + j)*3] = tmp;
+		}
+	}
+
+	fwrite(rgb_buffer, width*height * 3, 1, fpBmp);
+	fclose(fpRgb);
+	fclose(fpBmp);
+	free(rgb_buffer);
+	printf("Finish generate %s!\n", bmppath);
+}
+
+
+unsigned char clip_value(unsigned char x, unsigned char min_val, unsigned char  max_val){
+	if (x>max_val){
+		return max_val;
+	}
+	else if (x<min_val){
+		return min_val;
+	}
+	else{
+		return x;
+	}
+}
+/**
+*	Convert RGB24 file to YVU420 file
+*
+*
+*
+**********/
+void simple_rgb24_to_yuv420(const char *rgb24path, int width, int height, const char *yuv420path)
+{
+	FILE* fprgb = fopen(rgb24path,"rb+");
+	FILE* fpyuv = fopen(yuv420path, "wb+");
+	unsigned char* rgb_buffer = (unsigned char*)malloc(width*height*3);
+	unsigned char* y_buffer = (unsigned char*)malloc(width*height);
+	unsigned char* u_buffer = (unsigned char*)malloc(width*height/4);
+	unsigned char* v_buffer = (unsigned char*)malloc(width*height/4);
+	unsigned char* u_tmp = u_buffer;
+	unsigned char* v_tmp = v_buffer;
+
+	unsigned char r = 0, g = 0, b = 0;
+	unsigned char y = 0, u = 0, v = 0;
+	fread(rgb_buffer, width*height * 3, 1, fprgb);
+	for (int i = 0; i < height; i++)
+	{
+		for (int j = 0; j < width; j++)
+		{
+			r = rgb_buffer[(i*width + j) * 3];
+			g = rgb_buffer[(i*width + j) * 3 + 1];
+			b = rgb_buffer[(i*width + j) * 3 + 2];
+
+
+			y = (unsigned char)((66 * r + 129 * g + 25 * b + 128) >> 8) + 16;
+			u = (unsigned char)((-38 * r - 74 * g + 112 * b + 128) >> 8) + 128;
+			v = (unsigned char)((112 * r - 94 * g - 18 * b + 128) >> 8) + 128;
+
+			y_buffer[i*width + j] = clip_value(y, 0, 255);
+			if (i % 2 == 0)
+			{
+				if (j % 2 == 0)
+					*(u_buffer++) = clip_value(u, 0, 255);
+			}
+			else{
+				if (j % 2 == 0){
+					*(v_buffer++) = clip_value(v, 0, 255);
+				}
+			}
+
+		}
+	}
+	
+	fwrite(y_buffer,width*height,1,fpyuv);
+	fwrite(u_tmp, width*height / 4, 1, fpyuv);
+	fwrite(v_tmp, width*height / 4, 1, fpyuv);
+
+	free(rgb_buffer);
+	free(y_buffer);
+	free(u_tmp);
+	free(v_tmp);
+	fclose(fprgb);
+	fclose(fpyuv);
+}
+
+/**
+*	Generate RGB24 colorbar.
+*
+*
+*
+**********/
+void simple_rgb24_colorbar(int width, int height, char *url_out)
+{
+	unsigned char *data = NULL;
+	int barwidth;
+	char filename[100] = { 0 };
+	FILE *fp = NULL;
+	int i = 0, j = 0;
+
+	data = (unsigned char *)malloc(width*height * 3);
+	barwidth = width / 8;
+
+	if ((fp = fopen(url_out, "wb+")) == NULL){
+		printf("Error: Cannot create file!");
+		return;
+	}
+
+	for (j = 0; j<height; j++){
+		for (i = 0; i<width; i++){
+			int barnum = i / barwidth;
+			switch (barnum){
+			case 0:{
+					   data[(j*width + i) * 3 + 0] = 255;
+					   data[(j*width + i) * 3 + 1] = 255;
+					   data[(j*width + i) * 3 + 2] = 255;
+					   break;
+			}
+			case 1:{
+					   data[(j*width + i) * 3 + 0] = 255;
+					   data[(j*width + i) * 3 + 1] = 255;
+					   data[(j*width + i) * 3 + 2] = 0;
+					   break;
+			}
+			case 2:{
+					   data[(j*width + i) * 3 + 0] = 0;
+					   data[(j*width + i) * 3 + 1] = 255;
+					   data[(j*width + i) * 3 + 2] = 255;
+					   break;
+			}
+			case 3:{
+					   data[(j*width + i) * 3 + 0] = 0;
+					   data[(j*width + i) * 3 + 1] = 255;
+					   data[(j*width + i) * 3 + 2] = 0;
+					   break;
+			}
+			case 4:{
+					   data[(j*width + i) * 3 + 0] = 255;
+					   data[(j*width + i) * 3 + 1] = 0;
+					   data[(j*width + i) * 3 + 2] = 255;
+					   break;
+			}
+			case 5:{
+					   data[(j*width + i) * 3 + 0] = 255;
+					   data[(j*width + i) * 3 + 1] = 0;
+					   data[(j*width + i) * 3 + 2] = 0;
+					   break;
+			}
+			case 6:{
+					   data[(j*width + i) * 3 + 0] = 0;
+					   data[(j*width + i) * 3 + 1] = 0;
+					   data[(j*width + i) * 3 + 2] = 255;
+
+					   break;
+			}
+			case 7:{
+					   data[(j*width + i) * 3 + 0] = 0;
+					   data[(j*width + i) * 3 + 1] = 0;
+					   data[(j*width + i) * 3 + 2] = 0;
+					   break;
+			}
+			}
+
+		}
+	}
+	fwrite(data, width*height * 3, 1, fp);
+	fclose(fp);
+	free(data);
+}
