@@ -1,4 +1,6 @@
 
+#ifndef SIMPLE_MEDIA_RAW_H_
+#define SIMPLE_MEDIA_RAW_H_
 
 void simple_yuv420p_split(const char* url, int w, int h, int num);
 
@@ -23,3 +25,5 @@ void simple_rgb24_to_bmp(const char *rgb24path, int width, int height, const cha
 void simple_rgb24_to_yuv420(const char *rgb24path, int width, int height, const char *yuv420path);
 
 void simple_rgb24_colorbar(int width, int height, char *url_out);
+
+#endif

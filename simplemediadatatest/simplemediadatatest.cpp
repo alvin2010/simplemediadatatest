@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "simple_media_raw.h"
+#include "simple_h264.h"
 
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -30,6 +31,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	simple_rgb24_to_bmp("lena_256x256_rgb24.rgb", 256, 256, "output_lena.bmp");
 	simple_rgb24_to_yuv420("lena_256x256_rgb24.rgb", 256, 256, "output_lena.yuv");
 	simple_rgb24_colorbar(640, 360, "output_colorbar.rgb");
+
+	//	h264
+	simple_parse_h264("sintel.h264");
 	return 0;
 }
 

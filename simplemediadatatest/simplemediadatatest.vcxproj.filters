@@ -27,6 +27,9 @@
     <ClInclude Include="simple_media_raw.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="simple_h264.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -36,6 +39,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="simple_media_raw.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="simple_h264.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
