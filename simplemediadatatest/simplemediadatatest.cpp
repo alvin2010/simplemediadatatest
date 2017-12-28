@@ -32,8 +32,17 @@ int _tmain(int argc, _TCHAR* argv[])
 	simple_rgb24_to_yuv420("lena_256x256_rgb24.rgb", 256, 256, "output_lena.yuv");
 	simple_rgb24_colorbar(640, 360, "output_colorbar.rgb");
 
+	// spit
+	simple_pcm16le_split("NocturneNo2inEflat_44.1k_s16le.pcm");
+	simple_pcm16le_halfvolumeleft("NocturneNo2inEflat_44.1k_s16le.pcm");
+	simple_pcm16le_doublespeed("NocturneNo2inEflat_44.1k_s16le.pcm");
+	simple_pcm16le_to_pcm8("NocturneNo2inEflat_44.1k_s16le.pcm");
+	simple_pcm16le_cut_singlechannel("drum.pcm", 2360, 120);
+	simple_pcm16le_to_wav("NocturneNo2inEflat_44.1k_s16le.pcm", 2, 44100, "output_nocturne.wav");
+
 	//	h264
 	simple_parse_h264("sintel.h264");
+
 	return 0;
 }
 
