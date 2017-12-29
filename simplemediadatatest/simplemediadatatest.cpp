@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "simple_media_raw.h"
 #include "simple_h264.h"
+#include "simple_aac.h"
 
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -42,7 +43,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	//	h264
 	simple_parse_h264("sintel.h264");
-
+	simple_parse_aac("nocturne.aac");
 	return 0;
 }
 
