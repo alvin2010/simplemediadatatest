@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="simple_aac.h" />
+    <ClInclude Include="simple_flv.h" />
     <ClInclude Include="simple_h264.h" />
     <ClInclude Include="simple_media_raw.h" />
     <ClInclude Include="stdafx.h" />
@@ -87,8 +88,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="simplemediadatatest.cpp" />
+    <ClCompile Include="simple_flv.cpp" />
     <ClCompile Include="simple_h264.cpp" />
-    <ClCompile Include="simple_parse_aac.cpp" />
+    <ClCompile Include="simple_aac.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

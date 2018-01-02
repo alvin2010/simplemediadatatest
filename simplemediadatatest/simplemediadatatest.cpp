@@ -5,10 +5,11 @@
 #include "simple_media_raw.h"
 #include "simple_h264.h"
 #include "simple_aac.h"
+#include "simple_flv.h"
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-
+	/*
 	// split
 	simple_yuv420p_split("lena_256x256_yuv420p.yuv", 256, 256, 1);
 	simple_yuv422p_split("lena_256x256_yuv422p.yuv", 256, 256, 1);
@@ -44,6 +45,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	//	h264
 	simple_parse_h264("sintel.h264");
 	simple_parse_aac("nocturne.aac");
+	*/
+
+	simple_parse_flv("cuc_ieschool.flv");
+	
 	return 0;
 }
 
