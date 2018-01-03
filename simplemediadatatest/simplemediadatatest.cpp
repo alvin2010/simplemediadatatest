@@ -6,6 +6,7 @@
 #include "simple_h264.h"
 #include "simple_aac.h"
 #include "simple_flv.h"
+#include "simple_rtp.h"
 
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -45,10 +46,13 @@ int _tmain(int argc, _TCHAR* argv[])
 	//	h264
 	simple_parse_h264("sintel.h264");
 	simple_parse_aac("nocturne.aac");
+	
+	//	flv
+	simple_parse_flv("cuc_ieschool.flv");
 	*/
 
-	simple_parse_flv("cuc_ieschool.flv");
-	
+
+	simple_parse_rtp(8888);
 	return 0;
 }
 

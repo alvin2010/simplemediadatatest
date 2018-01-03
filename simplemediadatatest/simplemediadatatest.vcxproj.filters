@@ -36,6 +36,9 @@
     <ClInclude Include="simple_flv.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="simple_rtp.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -54,6 +57,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="simple_aac.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="simple_rtp.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
